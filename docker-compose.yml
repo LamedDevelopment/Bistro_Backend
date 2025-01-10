@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  api:
+    container_name: GoodBackend
+    restart: always
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    networks:
+      - backend_network
+    depends_on:
+      - mongo
+
+  web:    
+    container_name: GoodFrontend
+    restart: always
+    build:
+      context: ../Frontend_Kalos  # Cambiado a la ruta relativa
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+    volumes:
+      - ../Frontend_Kalos:/usr/src/app  # Cambiado a la ruta relativa
+      - /usr/src/app/node_modules
+    networks:
+      - backend_network
+    depends_on:
+      - api
+    working_dir: /usr/src/app
+
+  mongo:
+    container_name: Goodmongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db
+      - ../data/data/db:/data/db_backup
+    networks:
+      - backend_network
+
+networks:
+  backend_network:
