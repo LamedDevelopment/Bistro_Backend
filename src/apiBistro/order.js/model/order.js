@@ -109,8 +109,19 @@ const OrderSchema = Schema({
             type: Number,
             required: true
         },
-        tip: { // Valor de la Propina
-            type: Number,
+        tip: {
+            amount: {
+                type: Number, // Monto de la propina
+                default: 0 // Propina inicial es opcional y predeterminada a 0
+            },
+            notes: {
+                type: String, // Observaciones o agradecimientos opcionales
+            },
+            staff: {
+                type: Schema.Types.ObjectId, // Referencia al mesero (staff) que recibe la propina
+                ref: 'staff',
+                required: false // Opcional en caso de que no se asigne propina a un mesero específico
+            }
         },
         totalPromoCode: { // Suma si algun producto tiene a un valor de promocion
             type: Number,
@@ -236,7 +247,34 @@ const OrderSchema = Schema({
         observation: {
             type: String,
         }
-    }]
+    }],
+    AImanagement: [],
+    vector: {
+        data: [],
+        metadata: [{
+            id: {
+                type: String, // Un identificador único para cada vector.
+            },
+            numberTokens: {
+                type: Number, // Hacemos un conteo de los tokens usados para el embedding
+            },
+            timestamp: {
+                type: String, // La fecha y hora de creación del vector.
+            },
+            source: {
+                type: String, //La fuente de los datos utilizados para generar el vector. Nombre de la coleccion o documento
+            },
+            parameters: {
+                type: String, //Aqui ubicamos el nombre de los campos que usamos para embedding
+            },
+            description: {
+                type: String, //Una descripción textual del vector.
+            },
+        }],
+        relevance: {
+            type: Number, // Hacemos un conteo de los tokens usados para el embedding
+        } //o un nombre descriptivo que indique que el campo almacena la relevancia de un documento para una consulta específica.
+    },
 }, { collection: 'orders' });
 
 OrderSchema.index({
