@@ -18,12 +18,12 @@ const client = new OAuth2Client(GIUDLGN);
 
 
 
-const loginDAO = async (email, pass) => {  
-    
+const loginDAO = async (email, pass) => {    
     
     try {
         // verificar Email
         const staffDB = await staff.findOne({ email });
+        
         if (!staffDB) {
             return 'Email ó Contraseña No Valida 2'
         }
@@ -33,8 +33,9 @@ const loginDAO = async (email, pass) => {
         if (!validpass) {
             return 'Email ó Contraseña No Valida 3'
         }
-    
-        const token = await generarJWTStaff(staffDB.id, staffDB.role);
+        
+        const token = await generarJWTStaff(staffDB.id, staffDB.role, 
+            staffDB.membership[0].establishments.toString(), staffDB.membership[0].tradeName);
         
         return token
     } catch (error) {

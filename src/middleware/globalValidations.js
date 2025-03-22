@@ -26,7 +26,7 @@ const validateJWT = (req, res = response, next) => {
         req.role = verifyData.role;
         next();
     } catch (error) {
-        console.error(`Error en GlobalValidations: validateJWT > token ${token}, error: ${error}`);
+        // console.error(`Error en GlobalValidations: validateJWT > token ${token}, error: ${error}`);
         return res.status(401).json({
             ok: false,
             msg: 'Token inválido'
@@ -357,6 +357,23 @@ const preventNoSQLInjectionInternalControl = async (req, res = response, next) =
     }
 };
 
+const ShowTokenInComponentsDAO = async (token) => {
+    // LEER EL TOKEN
+    const decodedToken = jwt.verify(token, JWT_SECRET);
+    try {    
+        return {
+            ok: true,
+            msg: decodedToken,
+        };        
+    } catch (error) {
+        applogger.error(`Error en VALUSTKNDAO > ShowTokenInComponentsDAO: UserId: ${decodedToken.uid} error: ${error}`);
+        return {
+            ok: false,
+            msg: 'CREUSD4O-07: ' + error.code
+        }
+    }
+}
+
 
 module.exports = {
     validateJWT,
@@ -370,4 +387,5 @@ module.exports = {
     preventNoSQLInjection,
     preventNoSQLInjectionInternalControl,
     loginRateLimiter,
+    ShowTokenInComponentsDAO,
 };

@@ -1,12 +1,14 @@
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../../../utils/config');
 
-const generarJWTStaff = ( uid, role ) => {
+const generarJWTStaff = ( uid, role, establishments, tradeName ) => {
     return new Promise((resolve, reject) => {
 
         const payload = {
             uid,
-            role
+            role,
+            tradeName,
+            establishments
         };
 
         jwt.sign(payload, JWT_SECRET, {

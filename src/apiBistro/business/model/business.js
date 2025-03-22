@@ -124,6 +124,63 @@ const BusinessShema = Schema({
             message: 'El número máximo de imágenes permitidas es 3.'
         }
     },
+    tax: {
+        taxType: {
+            type: String,
+        },
+        taxPercentage: {
+            type: Number,
+        },
+        status: {
+            type: Boolean,
+            default: true
+        }
+    },
+    billingResolution:{
+        resolutionNumber: {     //"18760000001"
+            type: String,
+        },
+        startDate: {
+            type: String,       //"2019-01-19"
+        },
+        endDate: {
+            type: String,       //"2019-01-19"
+        },
+        prefix: {               //"SETP"
+            type: String,
+        },
+        startNumber: {          //"990000000"
+            type: Number,
+        },
+        currentNumbering: {     //"990000000"
+            type: Number,
+        },
+        endNumber: {
+            type: Number,       //"995000000"
+        },
+        typeCurrency: {         //"COP"
+            type: String,
+        },
+        claveTecnica: {         //"fc8eac422eba16e22ffd8c6f94b3f40a6e38162c"
+            type: String,
+        },
+        statusResolution:{
+            type: Boolean,
+            default: true
+        },
+        update: [{
+            user: {
+                type: Schema.Types.ObjectId,
+                ref: 'staff'
+            },
+            dateUpdate: {
+                type: String
+            },
+            observation: {
+                type: String
+            },
+        }]
+    },
     services: [],
     typeService: [],
     address: {

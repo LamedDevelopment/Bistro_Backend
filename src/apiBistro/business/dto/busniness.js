@@ -1,6 +1,6 @@
 class CreateDataBusinessDTO {
     constructor(businessName,tradeName,nit,branchoffices,email,movil,phone,img,address,country,countryCod,regionCountry,
-        city,zip,services,typeService,description) {
+        city,zip,billingResolution,tax,services,typeService,description) {
       this.businessName = businessName;
       this.tradeName = tradeName;
       this.nit = nit;
@@ -17,14 +17,16 @@ class CreateDataBusinessDTO {
       this.regionCountry = regionCountry;
       this.city = city;
       this.zip = zip;
+      this.tax = tax;
+      this.billingResolution = billingResolution;
       this.description = description;
     }
   }
 
 
 class CreateBusinessDTO {
-      constructor(businessName,tradeName,nit,branchoffices,email,movil,phone,img,address,country,countryCod,regionCountry,
-        city,zip,services,typeService,description, dateCreate) {
+      constructor(businessName,tradeName,nit,branchoffices,email,movil,phone,img, address,country,countryCod,regionCountry,
+        city,zip,billingResolution,tax,services,typeService,description,dateCreate) {
       this.businessName = businessName;
       this.tradeName = tradeName;
       this.nit = nit;
@@ -41,6 +43,8 @@ class CreateBusinessDTO {
       this.regionCountry = regionCountry;
       this.city = city;
       this.zip = zip;
+      this.tax = tax;
+      this.billingResolution = billingResolution;
       this.description = description;
       this.dateCreate = dateCreate;
     }

@@ -1,11 +1,11 @@
 /*  
     METODO: POST
-    RUTA: /api/mnbis
+    RUTA: /api/order
 */
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { validateFields } = require('../../middleware/globalValidations');
-const { createMenuBistro } = require('./controller/menuBistro');
+const { createOrders } = require('./controller/order');
 
 
 const router = Router();
@@ -16,11 +16,12 @@ const router = Router();
     PARAMETROS: @name, @lastName, @email, @movil, @pass, @terms
 */
 router.post('/',
-    [
-        check('business', 'El campo Business es Obligatorio').not().isEmpty(),
-        check('menu', 'El campo Menu es Obligatorio').not().isEmpty(),
-        validateFields,
-    ], createMenuBistro);
+        [
+            check('business', 'El campo Business es Obligatorio').not().isEmpty(),
+            check('menu', 'El campo Menu es Obligatorio').not().isEmpty(),
+            validateFields,
+        ],
+    createOrders
+    );
 
-
-    module.exports = router;
+module.exports = router;

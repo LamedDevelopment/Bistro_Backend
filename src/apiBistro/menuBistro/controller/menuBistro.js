@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const { response } = require('express');
-const { DataMenuBistroDTO } = require('../dto/menuBistroDTO');
-const { getCreateMenuBistroDAO } = require('../dao/menuBistroDAO');
+const { DataMenuBistroDTO, DataViewMenuBistroDTO } = require('../dto/menuBistroDTO');
+const { getCreateMenuBistroDAO, getViewMenuBistroDAO } = require('../dao/menuBistroDAO');
 const { applogger } = require('../../../utils/logger');
 
 const createMenuBistro = async (req, res) => {
@@ -30,25 +30,25 @@ const createMenuBistro = async (req, res) => {
 
 
 const viewMenuBistro = async (req, res) => {
+    const data = req.body;
 
-    try {
-        const uid = "DatosDelUsuario";
-        const data = req.body;
+    try {       
+        const DataViewMenuBistroDto = new DataViewMenuBistroDTO(data.business);
+        console.log('DataViewMenuBistroDto: ',DataViewMenuBistroDto);
+        
+        const createMenuBistroDao = await getViewMenuBistroDAO(DataViewMenuBistroDto);
 
-        const DataMenuBistroDto = new DataMenuBistroDTO(uid, data.business, data.menu);
-
-        const createMenuBistroDao = await getCreateMenuBistroDAO(DataMenuBistroDto);
-
-        res.json({
+        res.status(200).json({
             ok: true,
-            msg: `Se Creo el Menu de: ${data.business.nit}: ${data.business.tradename}`
+            msg: createMenuBistroDao.msg.menu,
         });
         
     } catch (error) {
-        applogger.error(`MNBISCLL-01: Error al Crear el Menu de ${data.business.nit}: ${data.business.tradename}, error: ${error}`);
+        console.log(error);
+        applogger.error(`MNBISCLL-02: Error al Visualizar el Menu de ${data.business.nit}: ${data.business.tradename}, error: ${error}`);
         res.json({
             ok: true,
-            msg: `NO Se Creo el Menu de: ${data.business.nit}: ${data.business.tradename}`
+            msg: `Error al Visualizar el Menu de: ${data.business.nit}: ${data.business.tradename}`
         });
     }
 }

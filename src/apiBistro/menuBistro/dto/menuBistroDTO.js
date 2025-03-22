@@ -13,6 +13,20 @@ class DataMenuBistroDTO {
 }
 
 
+class DataViewMenuBistroDTO {
+    constructor( business) {
+        this.business = {
+            businessID: business.businessID,
+            nit: business.nit,
+            businessName: business.businessName,
+            tradename: business.tradename,
+            countryCod: business.countryCod
+        };
+    }
+}
+
+
 module.exports = { 
-    DataMenuBistroDTO 
+    DataMenuBistroDTO,
+    DataViewMenuBistroDTO
 }

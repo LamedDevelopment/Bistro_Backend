@@ -12,7 +12,7 @@ module.exports = {
     MONGO_URL: data.parsed.MONGO_URL,
     JWT_SECRET: data.parsed.JWT_SECRET,
     QR_SECRET: data.parsed.QR_SECRET,
-    // URL_QR: data.parsed.URL_QR,
+    URL_QR: data.parsed.URL_QR,
     // URL_MAIL: data.parsed.URL_MAIL,
     // URL_BACKEND: data.parsed.URL_BACKEND,
     // GIUDLGN: data.parsed.GIUDLGN,

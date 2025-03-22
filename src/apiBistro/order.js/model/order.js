@@ -18,16 +18,28 @@ const OrderSchema = Schema({
         },
         countryCod: {
             type: String
+        },
+        tableID: {
+            type: String
         }
     },
-    client: [{
+    client: {
         document: {
             type: String,
         },
         fullName: {
             type: String,
         },
-    }],
+        phone: {
+            type: Number,
+        },
+        address: {
+            type: String,
+        },
+        addressComplement: {
+            type: String,
+        }
+    },
     orderDetails: {
         items: [
             {
@@ -84,6 +96,7 @@ const OrderSchema = Schema({
                 },
                 tableID: {
                     type: Number, // Referencia al numero de la Mesa
+                    default: 0
                 },
                 table: {
                     type: Number, // Referencia al Numero menor de la Mesa, en caso de combinacion
@@ -93,12 +106,25 @@ const OrderSchema = Schema({
                     type: Number,// Referencia a otras mesas combinadas
                     default: 0
                 }],
+                staff: {
+                    staffID: {
+                        type: Schema.Types.ObjectId,
+                        ref: 'staff',
+                    },
+                    fullName: {
+                        type: String,
+                    }
+                }
             }
         ],
-        deliveryMethod: { //TODO: Aqui definimos como se entrega el pedido
+        gratuity: {
+            type: Number,
+            default: 0
+        },
+        deliveryMethod: { //TODO: Aqui definimos como se entrega el pedido, si todo en una sola entrega
             type: String,
             enum: ['allAtOnce', 'asReady'],
-            default: 'asReady', // Valor predeterminado para la entrega a la mesa
+            default: 'allAtOnce', // Valor predeterminado para la entrega a la mesa
         },
         status: { //TODO: Aqui definimos las etapa del pedido
             type: String,
@@ -118,21 +144,33 @@ const OrderSchema = Schema({
                 type: String, // Observaciones o agradecimientos opcionales
             },
             staff: {
-                type: Schema.Types.ObjectId, // Referencia al mesero (staff) que recibe la propina
-                ref: 'staff',
-                required: false // Opcional en caso de que no se asigne propina a un mesero específico
+                staffID: {
+                    type: Schema.Types.ObjectId,
+                    ref: 'staff',
+                },
+                fullName: {
+                    type: String,
+                }
             }
         },
         totalPromoCode: { // Suma si algun producto tiene a un valor de promocion
             type: Number,
+            default: 0
         },
         tax: {
-            type: Number,
-            required: true
+            taxType: {
+                type: String,
+            },
+            taxPercentage: {
+                type: Number,
+            },
+            status: {
+                type: Boolean,
+            },
         },
         totalAmount: {
             type: Number,
-            required: true
+            default: 0
         }
     },
     delivery: {
@@ -143,8 +181,8 @@ const OrderSchema = Schema({
         },
         status: {
             type: String,
-            enum: ['Pending', 'In Transit', 'Delivered', 'Incomplete Order', 'Cancelled'],
-            default: 'Pending' // Estado inicial del domicilio
+            enum: ['Unpaid Order','Paid in Full','Partially Paid', 'Pending', 'In Transit', 'Delivered', 'Incomplete Order', 'Cancelled'],
+            default: 'Unpaid Order' // Estado inicial del Pedido
         },
         cost: {
             type: Number,
@@ -153,86 +191,48 @@ const OrderSchema = Schema({
         estimatedTime: {
             type: String, // Tiempo estimado de entrega
             // required: function() { return this.delivery.method === 'HomeDelivery'; }
+        },
+        address: {
+            type: String, // Direccion de entrega del Domicilio
+        },
+        addressComplement: {
+            type: String, // Informacion adicional de la direccion de entrega del Domicilio
         }
     },
     orderStatus: {
         type: String,
-        enum: ['Pending', 'In Transit', 'Delivered', 'Incomplete Order', 'Cancelled'],
+        enum: ['Pending', 'In Transit', 'Delivered', 'Incomplete Order', 'Cancelled', 'Closed Order'],
         default: 'Pending'
     },
-    payment: [{
-        method: {
-            type: String,
-            enum: ['Cash', 'Credit Card', 'Online Payment', 'Digital Wallet', 'PayPal', 'CryptoCurrency'],
-            required: true
-        },
-        status: {
-            type: String,
-            enum: ['Authorized', 'Refunded', 'Partially Paid', 'Disputed', 'Expired', 'Chargeback', 'In Progress', 'On Hold'],
-            default: 'Pending'
-        },
-        amount: {
-            type: Number,
-            required: true // El monto del pago realizado
-        },
-        fullName: {
-            type: String,
-            required: false // Nombre del cliente que hizo el pago (opcional)
-        },
-        timestamp: {
-            type: String, // Fecha y hora en que se realizó el pago
-        },
-        paidItems: [{
-            name: {
-                type: String,
-                required: true
+    payment: [
+        {
+            method: { type: String, enum: ['Cash', 'Credit Card', 'Online Payment', 'Digital Wallet', 'PayPal', 'CryptoCurrency']},
+            status: { 
+                type: String, 
+                enum: ['Unpaid Order','Paid in Full', 'Authorized', 'Refunded', 'Partially Paid', 'Disputed', 'Expired', 'Chargeback', 'In Progress', 'On Hold'], 
+                default: 'Unpaid Order' 
             },
-            quantity: {
-                type: Number,
-                required: true,
-                min: 1
-            },
-            price: {
-                type: Number,
-                required: true
-            },
-        }],
-        electronicInvoice: {
-            required: {
-                type: Boolean,
-                default: false // Indica si el cliente solicitó una factura electrónica
-            },
-            fullName: {
-                type: String, // Número de la factura electrónica // Solo requerido si se solicita factura electrónica
-            },
-            documentNumber: {
-                type: String, // Número de la factura electrónica // Solo requerido si se solicita factura electrónica
-            },
-            email: {
-                type: String, // Número de la factura electrónica // Solo requerido si se solicita factura electrónica
-            },
-            address: {
-                type: String, // Número de la factura electrónica // Solo requerido si se solicita factura electrónica
-            },
-            invoiceNumber: {
-                type: String, // Número de la factura electrónica
-                //required: function() { return this.electronicInvoice; } // Solo requerido si se solicita factura electrónica
-            },
-            documentType: {
-                type: String,
-                enum: ['Factura', 'Boleta'], // Tipos de documento disponibles
-                //required: function() { return this.electronicInvoice; } // Solo requerido si se solicita factura electrónica
-            },
-            issueDate: {
-                type: Date, 
-                //required: function() { return this.electronicInvoice; } // Solo requerido si se solicita factura electrónica
-            },
-            taxId: {
-                type: String, // NIT o RUC del cliente (opcional)
-                required: false // Puede ser requerido dependiendo de las regulaciones fiscales locales
+            amount: { type: Number },
+            fullName: { type: String },
+            timestamp: { type: String },
+            paidItems: [{
+                name: { type: String },
+                quantity: { type: Number },
+                price: { type: Number }
+            }],
+            electronicInvoice: {
+                required: { type: Boolean },
+                fullName: { type: String },
+                documentNumber: { type: String },
+                email: { type: String },
+                address: { type: String },
+                invoiceNumber: { type: String },
+                documentType: { type: String, enum: ['Factura', 'Boleta'] },
+                issueDate: { type: Date },
+                taxId: { type: String }
             }
         }
-    }],
+    ],
     createdAt: {
         type: String        
     },    
@@ -277,93 +277,51 @@ const OrderSchema = Schema({
     },
 }, { collection: 'orders' });
 
+// Índices para business
+OrderSchema.index({ 'business.businessID': 1 });
+OrderSchema.index({ 'business.nit': 1 });
+OrderSchema.index({ 'business.nameBusiness': 1 });
+OrderSchema.index({ 'business.tradename': 1 });
+OrderSchema.index({ 'business.countryCod': 1 });
 OrderSchema.index({
-    'business.businessID': 1
-});
-OrderSchema.index({
-    'business.nit': 1
-});
-OrderSchema.index({
-    'business.nameBusiness': 1
-});
-OrderSchema.index({
-    'business.tradename': 1
-});
-OrderSchema.index({
-    'business.countryCod': 1
+  'business.businessID': 1,
+  'business.nit': 1,
+  'business.nameBusiness': 1,
+  'business.tradename': 1,
+  'business.countryCod': 1
 });
 
+// Índices para client
+OrderSchema.index({ 'client.document': 1 });
+OrderSchema.index({ 'client.fullName': 1 });
+OrderSchema.index({ 'client.document': 1, 'client.fullName': 1 });
+
+// Índice compuesto sin campos de arreglos paralelos
 OrderSchema.index({
-    'business.businessID': 1,
-    'business.nit': 1,
-    'business.nameBusiness': 1,
-    'business.tradename': 1,
-    'business.countryCod': 1
+  'business.nit': 1,
+  'client.document': 1,
+  'client.fullName': 1,
+  'orderStatus': 1
 });
 
+// Índices individuales para campos que son arreglos
+OrderSchema.index({ 'orderDetails.items.name': 1 });
+OrderSchema.index({ 'payment.method': 1 });
 
-OrderSchema.index({
-    'client.document': 1
-});
-OrderSchema.index({
-    'client.fullName': 1
-});
-OrderSchema.index({
-    'client.document': 1,
-    'client.fullName': 1
-});
+// Otros índices para orderDetails
+OrderSchema.index({ 'orderDetails.items.productID': 1 });
+OrderSchema.index({ 'orderDetails.items.notes': 1 });
+OrderSchema.index({ 'orderDetails.items.combinedTables': 1 });
+OrderSchema.index({ 'orderDetails.items.tableID': 1 });
+OrderSchema.index({ 'orderDetails.items.table': 1 });
+OrderSchema.index({ 'orderDetails.items.mainTable': 1 });
 
-OrderSchema.index({
-    'business.nit': 1,
-    'client.document': 1,
-    'client.fullName': 1,
-    'orderDetails.items.name': 1,
-    'payment.method': 1,
-    'orderStatus': 1
-});
+// Índices para delivery
+OrderSchema.index({ 'delivery.method': 1 });
+OrderSchema.index({ 'delivery.status': 1 });
 
-OrderSchema.index({
-    'orderDetails.items.productID': 1
-});
-OrderSchema.index({
-    'orderDetails.items.notes': 1
-});
-OrderSchema.index({
-    'orderDetails.items.name': 1
-});
-OrderSchema.index({
-    'orderDetails.items.combinedTables': 1
-});
-OrderSchema.index({
-    'orderDetails.items.tableID': 1
-});
-OrderSchema.index({
-    'orderDetails.items.table': 1
-});
-OrderSchema.index({
-    'orderDetails.items.mainTable': 1
-});
-
-OrderSchema.index({
-    'delivery.method': 1
-});
-OrderSchema.index({
-    'delivery.status': 1
-});
-
-OrderSchema.index({
-    'orderStatus': 1
-});
-OrderSchema.index({
-    'payment.method': 1
-});
-OrderSchema.index({
-    'payment.status': 1
-});
-OrderSchema.index({
-    'createdAt': 1
-});
-
+// Otros índices
+OrderSchema.index({ 'payment.status': 1 });
 
 
 OrderSchema.method('toJSON', function() {
@@ -373,7 +331,7 @@ OrderSchema.method('toJSON', function() {
 
 
 
-module.exports = model('order', OrderSchema);
+module.exports = model('orders', OrderSchema);
 
 /**
  * 

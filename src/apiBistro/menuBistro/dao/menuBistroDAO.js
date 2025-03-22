@@ -55,6 +55,47 @@ const getCreateMenuBistroDAO = async (DataMenuBistroDto) => {
   };
   
 
-module.exports = { 
-    getCreateMenuBistroDAO, 
+  const getViewMenuBistroDAO = async (DataViewMenuBistroDto) => {
+    
+    const { nit, business, tradename, countryCod } = DataViewMenuBistroDto.business;
+        
+    try {
+
+      const getViewMenuBistro = await menuBistro.findOne(
+        { 
+          'business.nit': nit,
+          'business.tradename': tradename, 
+          'business.countryCod': countryCod,
+          'menu.status': true,
+          'menu.product.status': true
+        },
+        {
+          'menu.product.name': 1,
+          "menu.product.description": 1,
+          "menu.product.price": 1,
+          "menu.product.img": 1,
+          "menu.product._id": 1
+        }
+      );
+      
+      return {
+        ok: true,
+        msg: getViewMenuBistro,
+      };
+    } catch (error) {
+      
+      applogger.error(`MNBIS-02: getViewMenuBistroDAO > Error al Consultar el Menu de: ${business} ${nit}, errores ${error}`);
+        return {
+            ok: false,
+            msg: `MNBIS-01: getCreateMenuBistroDAO > Error al Crear el Menu de: ${business} ${nit}, errores ${error}`
+        }
+    }
+
+  }
+
+
+
+  module.exports = { 
+    getCreateMenuBistroDAO,
+    getViewMenuBistroDAO, 
 }

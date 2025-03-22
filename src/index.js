@@ -36,7 +36,7 @@ app.use(`${version}/cust`, require('./apiBistro/customer/routes'));
 // TODO: Gestion de Business
 app.use(`${version}/buss`, require('./apiBistro/business/routes'));
 app.use(`${version}/mnbis`, require('./apiBistro/menuBistro/routes'));
-
+app.use(`${version}/bill`, require('./apiBistro/billing/routes'));
 
 
 // configuramos el Servidor de express

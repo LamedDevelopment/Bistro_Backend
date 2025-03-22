@@ -5,7 +5,7 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
 const { isEmail, validateFields, validateJWT } = require('../../middleware/globalValidations');
-const { createBusiness } = require('./controller/business');
+const { createBusiness, getCreateTableBusiness } = require('./controller/business');
 
 
 const router = Router();
@@ -27,6 +27,16 @@ router.post('/',
         check('typeService', 'Aceptar los typeService es Obligatorio').not().isEmpty(),
         validateFields,
     ], createBusiness);
+
+
+router.post('/cretableqr',
+    [
+        validateJWT,
+        check('business', 'El campo business es Obligatorio').not().isEmpty(),
+        check('numIniTable', 'Aceptar los numIniTable es Obligatorio').not().isEmpty(),
+        check('numEndTable', 'Aceptar los numEndTable es Obligatorio').not().isEmpty(),
+        validateFields,
+    ], getCreateTableBusiness);
 
 
 
